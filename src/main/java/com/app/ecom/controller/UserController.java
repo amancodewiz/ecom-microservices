@@ -1,5 +1,9 @@
-package com.app.ecom;
+package com.app.ecom.controller;
 
+import com.app.ecom.dto.UserRequest;
+import com.app.ecom.dto.UserResponse;
+import com.app.ecom.model.User;
+import com.app.ecom.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -40,7 +44,7 @@ public class UserController {
      * @return ResponseEntity containing a list of users and HTTP status 200 (OK)
      */
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
         // Either ResponseEntity.ok(...) or new ResponseEntity<>(..., HttpStatus.OK) both are valid.
         return new ResponseEntity<>(userService.fetchAllUsers(), HttpStatus.OK);
     }
@@ -56,7 +60,7 @@ public class UserController {
      * This implementation uses Optional and Streams for cleaner, null-safe code.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
+    public ResponseEntity<UserResponse> getUser(@PathVariable Long id) {
         // Using Optional's map to directly wrap the user in a ResponseEntity if present
         return userService.fetchUser(id)
                 .map(ResponseEntity::ok)
@@ -73,8 +77,8 @@ public class UserController {
      * @RequestBody tells Spring to map the incoming JSON payload to a User object.
      */
     @PostMapping
-    public ResponseEntity<String> createUser(@RequestBody User user) {
-        userService.addUser(user);
+    public ResponseEntity<String> createUser(@RequestBody UserRequest userRequest) {
+        userService.addUser(userRequest);
         return ResponseEntity.ok("User Added Successfully");
     }
 
@@ -91,8 +95,9 @@ public class UserController {
      * @return ResponseEntity with success or failure message based on update status
      */
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody User updatedUser) {
-        boolean updated = userService.updateUser(id, updatedUser);
+    public ResponseEntity<String> updateUser(@PathVariable Long id,
+                                             @RequestBody UserRequest updateUserRequest) {
+        boolean updated = userService.updateUser(id, updateUserRequest);
         if (updated) {
             return ResponseEntity.ok("User Updated Successfully");
         }
